@@ -66,5 +66,5 @@ else:
   print(f"Bitte bezahlen Sie den Betrag {preis_stand} Euro")
 
 print("Viel Spaß im Film")
-print("Ich hoffe Ihnen hat mein Programm gefallen. Ich bin offen für Verbesserung. Ich hab erst seit 20 Tagen mit dem Programmieren angefangen")
+print("Ich hoffe Ihnen hat mein Programm gefallen. Ich bin offen für Verbesserung. Ich hab erst seit dem 22.07.2025 richtig angefangen programmieren zu lernen.")
   
