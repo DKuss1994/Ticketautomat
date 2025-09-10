@@ -1,70 +1,97 @@
-# Ich will ein Kinoticket Automat erstellen. Es werden 3 Kategorien angezeigt Kind, Erwachsen, Senior. Ab insgesammt 10 Tickets soll man eine Rabatt bekommen.
-
-# Werte
-
-kind = 5 # Kinder sind von 0 - 17 Jahre
-maxkind = 18 #max alter ist 18
-erwachsen = 10 # Erwachsen sind zwischen 18 und 65
-maxerwachsen = 65 #max alter 65
-senior = 7.5 #Senioren sind ab 65
-
-def alter_pruefung (alter):
-  if alter < maxkind:
-    preis = kind
-    kategorie = "Kind"
-  elif alter <= maxerwachsen:
-     preis = erwachsen
-     kategorie = "Erwachsen"
-  else:
-    preis = senior
-    kategorie = "Senior"
-  print(f"Sie sind {alter} alt. Das wäre dann {kategorie}. Da kostet ein Ticket {preis}")
-  return preis, kategorie
-
-
-def weiter_kaufen ():
-  ende = input("Möchten Sie weitere Tickets kaufen? (j)")
-  if ende != "j":
-    
-    return False
-  return True
-  
-  
-preis_stand = 0
-anzahl_stand = 0
-rabatt = 0.8 #20% Rabatt
-while True:
-  try:
-    alter = int(input("Wie alt sind Sie? "))
-    #Hier wird geprüft in welche Kategorie die Person ist.
-    preis, kategorie = alter_pruefung(alter)
-    #Hier wird nach der Anzahl wieviel Tickets er in der Kategorie haben will gefragt.
-    anzahl = int(input(f"Wieviele Tickets wollen Sie haben in der Kategorie {kategorie}? "))
-    # Hier wird im System die Aktuelle Anzahl und der Aktuelle Preis im durchlauf berechnet
-    anzahl_stand += anzahl
-    gesamt = anzahl*preis
-    preis_stand += gesamt
-    # Hier soll der Rabatt berchnet werden
-    print(f"Ihr gesamt Preis beträgt {preis_stand} Euro")
-    
-    if anzahl_stand >= 10:
-      print(f"Sie bekommen Gruppen Rabatt von 20% auf den Gesamtpreis")
-    if not weiter_kaufen():
-      break
+class Automat:
+  def __init__(self):
+    self.preis_stand = 0
+    self.preis_ticket = 0
+    self.anzahl_stand = 0
+    self.rabatt = 0
+    self.rabatt_anzahl = 0
+    self.admincode = "6666"
+  def admin_check(self, eingabe):
+    return eingabe == self.admincode
+  def admin_modus(self):
+    while True: 
+      funktion = input("a für Admin-Einstellungen, c für Admin-Codewort ändern und n für Programm beenden(a/c/n) ").strip().lower()
+      if funktion == "a":
+        print ("Admin-Einstellungen werden aufgerufen. ")
+        self.automat_einrichten()
+      elif funktion == "c":
+        print("Neues Codewort wird erstellt!")
+        while True:
+          
+          pw1 = input("Neues Passwort eingeben.")     
+          pw2 = input ("Passwort bestätigen.")         
+          if pw1 == pw2:
+            self.admincode = pw1
+            print(f"Neues Admin Passwort ist {self.admincode}")
+            return self.admincode
+            
+          else:
+            print ("Passwörter stimmen nicht überein")
+            continue
+      elif funktion == "n":
+        print ("Adminmodus wurde beendet")
+        return self.admincode
+  def eingabe(self,frage:str,typ):
+    eingabe = str(input(frage))
+    try:
+      if self.admin_check(eingabe):
+        self.admin_modus()
+      elif typ == int:
+        return int(eingabe)
+      elif typ == float:
+        return float(eingabe)
+      elif typ == str:
+        return str(eingabe)
+    except ValueError:
+      print(f"Bitte eine gültige {typ.__name__} machen.")
       
-    
-    
-  
-       
-      if not weiter_kaufen():
+  def preis(self):
+    self.preis_stand = self.preis_ticket*self.anzahl_stand
+    return self.preis_stand
+  def anzahl_tickets(self):
+    stand = self.eingabe("Wieviele Tickets möchtest du haben ? ",int)
+    self.anzahl_stand += int(stand)
+  def rabatt_berechnen(self):
+    if self.anzahl_stand >= self.rabatt_anzahl:
+      print(f"Sie bekommen ein Rabbat von {self.rabatt}% auf Ihre Tickets")
+      self.preis_stand = self.preis_stand - (self.preis_stand*self.rabatt/100)
+      print(f"Deine Tickets kosten aktuell {self.preis_stand} Euro.")
+  def beenden (self):
+    while True:
+      stop = self.eingabe(f"Möchtest du noch weitere Tickets kaufen? Du hast aktuell {self.anzahl_stand} Tickets die kosten {self.preis_stand} (j/n)",str).strip().lower()
+      if stop == "n":
+        print(f"Bitte bezahlen Sie den Betrag von {self.preis_stand} Euro.")
+        return False
         break
-  except ValueError:
-    print("Bitte benutzten Sie Zahlen") 
-if anzahl_stand >= 10:
-  print(f"Sie bekommen Gruppen Rabatt von 20% auf den Gesamtpreis von {preis_stand} Euro. Somit ist ihr aktueller Preis {preis_stand*rabatt} Euro.")
-else:
-  print(f"Bitte bezahlen Sie den Betrag {preis_stand} Euro")
+      elif stop == "j":
+        break
 
-print("Viel Spaß im Film")
-print("Ich hoffe Ihnen hat mein Programm gefallen. Ich bin offen für Verbesserung. Ich hab erst seit dem 22.07.2025 richtig angefangen programmieren zu lernen.")
-  
+      else:
+        print("Bitte gibt j für ja und n für nein ein! ")
+        continue
+  def automat_einrichten(self):
+    while True:
+      
+      self.rabatt = self.eingabe("Wieviel Prozent soll vom Ticketpreis runter gehen? ",float)
+      try:
+        if self.rabatt>100:
+          print("Du bist über 100% das ist nicht möglich.")
+          continue
+        
+      except TypeError:
+        continue
+      self.rabatt_anzahl = self.eingabe("Ab wieviele Tickets soll der Rabatt eingeführt werden? ",int)
+      self.preis_ticket = self.eingabe("Wieviel sollen die Tickets kosten? ",float)
+      print(f"Die Einstellungen wurden geändert: Rabatt = {self.rabatt}, Wieviele Tickets Rabatt = {self.rabatt_anzahl}, Ticketpreis = {self.preis_ticket}")
+      break
+  def hauptprogramm(self):
+    self.automat_einrichten()
+    while True:
+      self.anzahl_tickets()
+      self.preis()
+      self.rabatt_berechnen()
+      beenden = self.beenden()
+      if beenden == False:
+        break
+automat = Automat()
+automat.hauptprogramm()
